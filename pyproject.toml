@@ -1,0 +1,26 @@
+[build-system]
+requires = [
+    "setuptools >= 77.0.3",
+    "flask >= 3.1.2"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gp-flask"
+version = "0.0.1"
+authors = [
+  { name="Ender(Suzu)" },
+]
+description = "Some flask extensions for server side storage and other things"
+readme = "README.md"
+requires-python = ">=3.13.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/endert1099/gpflask"
+Issues = "https://github.com/endert1099/gpflask/issues"
