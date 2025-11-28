@@ -1,10 +1,11 @@
 from os import PathLike
-from os.path import join
+from os.path import join, exists
 from flask import Flask, request
 from typing import Any, Callable    
 from exceptions import *
 from time import time
 from math import floor
+import json
 import traceback
 
 class DataPacket:
@@ -80,3 +81,72 @@ class GPFlask(Flask):
     
     def get_packets_between_during_time(self, begin_timestamp: int, end_timestamp: int) -> list[DataPacket]:
         return self.get_packets_with_condition(lambda x: begin_timestamp <= x.timestamp <= end_timestamp)
+    
+    def save_as_formatted_log(self, output_path: str) -> float:
+        s = time()
+        out = join(output_path, f"{floor(s)}.log")
+        if exists(out):
+            raise FileExistsError("A log has already been created at this timestamp. Are you saving your logs in a loop?")
+        
+        data = "Named Storage:\n"
+        for v in self.named_storage:
+            data += f"{v}: {self.named_storage[v]}\n"
+
+        data += "\nUnnamed Storage:\n"
+        for v in self.storage:
+            data += f"Source: {v.source}\nTimestamp: {v.timestamp}\nData: {v.data}\n"
+
+        with open(out, "wt") as f:
+            f.write(data)
+
+        return time() - s
+
+    def save_as_formatted_log_append(self, output_path: str) -> float:
+        s = time()
+        out = join(output_path, f"{floor(s)}.log")
+        if exists(out):
+            raise FileExistsError("A log has already been created at this timestamp. Are you saving your logs in a loop?")
+        
+        with open(out, "at") as f:
+            f.write("Named Storage:\n")
+        for v in self.named_storage:
+            with open(out, "at") as f:
+                data = f"{v}: {self.named_storage[v]}\n"
+                f.write(data)
+        with open(out, "at") as f:
+            f.write("\nUnnamed Storage:\n")
+        for v in self.storage:
+            with open(out, "at") as f:
+                data = f"Source: {v.source}\nTimestamp: {v.timestamp}\nData: {v.data}\n"
+                f.write(data)
+        
+        return time() - s
+    
+    def save_as_json(self, output_path: str) -> float:
+        s = time()
+        out = join(output_path, f"{floor(s)}.json")
+        if exists(out):
+            raise FileExistsError("A JSON file has already been created at this timestamp. Are you saving the file in a loop?")
+        
+        data = {"named_storage": self.named_storage, "unnamed_storage": self.storage}
+        with open(out, "wt") as f:
+            f.write(json.dumps(data))
+
+        return time() - s
+    
+    def load_from_json(self, input_path: str) -> float:
+        s = time()
+        if not exists(input_path):
+            raise FileNotFoundError("The JSON file doesn't exist")
+        
+        with open(input_path, "rt") as f:
+            try:
+                data = json.loads(f.read())
+                if (not data["named_storage"]) or (not data["unnamed_storage"]):
+                    raise LoadStorageException("The JSON file is missing 1 or more of the following items in the root object: \"named_storage\", \"unnamed_storage\"")
+                self.storage = data["unnamed_storage"]
+                self.named_storage = data["named_storage"]
+            except json.JSONDecodeError:
+                raise LoadStorageException("The JSON file contained invalid syntax. See traceback for more details.")
+
+        return time() - s
