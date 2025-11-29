@@ -1,1 +1,3 @@
 __pycache__/
+dist/
+gp_flask.egg-info/
