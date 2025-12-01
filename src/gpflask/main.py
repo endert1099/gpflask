@@ -2,7 +2,7 @@ from os import PathLike
 from os.path import join, exists
 from flask import Flask, request
 from typing import Any, Callable    
-from exceptions import *
+from .exceptions import *
 from time import time
 from math import floor
 import json
@@ -122,6 +122,9 @@ class GPFlask(Flask):
         
         return time() - s
     
+    def get_as_json(self) -> dict[str, list[DataPacket] | dict[str, dict[str, Any]]]:
+        return {"named_storage": self.named_storage, "unnamed_storage": self.storage}
+
     def save_as_json(self, output_path: str) -> float:
         s = time()
         out = join(output_path, f"{floor(s)}.json")

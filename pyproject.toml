@@ -1,19 +1,22 @@
 [build-system]
 requires = [
     "setuptools >= 77.0.3",
-    "flask >= 3.1.2"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "gp-flask"
-version = "0.0.1"
+version = "0.0.7"
+dependencies = [
+  "flask >= 3.1.2"
+]
+
 authors = [
   { name="Ender(Suzu)" },
 ]
 description = "Some flask extensions for server side storage and other things"
 readme = "README.md"
-requires-python = ">=3.13.7"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
